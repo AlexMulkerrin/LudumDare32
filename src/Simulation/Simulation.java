@@ -24,7 +24,7 @@ public class Simulation {
         name = randomWorldName();
         
         turn=0;
-        mana=1;
+        mana=10000;
         
         log = new EventLog();
         
@@ -53,14 +53,27 @@ public class Simulation {
             toUpdate.update();
             if (toUpdate.population<1) {
                 unit.remove(i);
-                log.add(turn+": Tribe "+toUpdate.name+" died.");
+                if (toUpdate.isNomadic) {
+                    log.add(turn+": Tribe "+toUpdate.name+" died.");
+                } else {
+                    log.add(turn+": Settlement "+toUpdate.name+" died.");
+                }
                 i--;
-            } else if(toUpdate.population>100) {
+            } else {
+                if (toUpdate.isNomadic && toUpdate.population>100) {
                 unit.add(map.createNewTribe(toUpdate.x, toUpdate.y));
                 toUpdate.population-=50;
                 Agent temp = unit.get(unit.size()-1);
                 log.add(turn+": Tribe "+toUpdate.name+
                         " has created tribe "+temp.name+".");
+                }
+                if ( toUpdate.population>200) {
+                unit.add(map.createNewTribe(toUpdate.x, toUpdate.y));
+                toUpdate.population-=50;
+                Agent temp = unit.get(unit.size()-1);
+                log.add(turn+": Settlement "+toUpdate.name+
+                        " has created tribe "+temp.name+".");
+                }
             }
         }
         map.update(unit);

@@ -58,18 +58,18 @@ class StatPanel extends JPanel{
         String contents = "Total Area: "+targetSim.map.getWidth()*targetSim.map.getHeight()+"\n";
         
         contents += "Total Land: "+targetSim.map.totalLand;
-        int percent = 100*targetSim.map.totalLand/(targetSim.map.getWidth()*targetSim.map.getHeight());
+        int percent = getPercentage(targetSim.map.totalLand,(targetSim.map.getWidth()*targetSim.map.getHeight()));
         contents +=" ("+percent+"%)\n";
         
         contents += "of which: \n";
         contents += "Fertile: "+targetSim.map.totalFertile;
-        percent = 100*targetSim.map.totalFertile/targetSim.map.totalLand;
+        percent = getPercentage(targetSim.map.totalFertile,targetSim.map.totalLand);
         contents +=" ("+percent+"%)\n";
         contents += "Average: "+targetSim.map.totalAverage;
-        percent = 100*targetSim.map.totalAverage/targetSim.map.totalLand;
+        percent = getPercentage(targetSim.map.totalAverage,targetSim.map.totalLand);
         contents +=" ("+percent+"%)\n";
         contents += "Barren: "+targetSim.map.totalBarren;
-        percent = 100*targetSim.map.totalBarren/targetSim.map.totalLand;
+        percent = getPercentage(targetSim.map.totalBarren,targetSim.map.totalLand);
         contents +=" ("+percent+"%)\n";
         
         landStats.setText(contents);
@@ -81,5 +81,13 @@ class StatPanel extends JPanel{
         contents += "Average Faction population: "+targetSim.getAveragePop()+"\n";
         contents += "World population: "+targetSim.getTotalPop();
         factionStats.setText(contents);
+    }
+    
+    public int getPercentage(int i, int j) {
+        if (j!=0) {
+            return 100*i/j;
+        } else {
+            return 0;
+        }
     }
 }

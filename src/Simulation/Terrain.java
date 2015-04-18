@@ -93,6 +93,8 @@ public class Terrain {
         }
     }
     
+    //public void 
+    
     public void generateFertility() {
         totalFertile=0;
         totalAverage=0;
@@ -226,11 +228,48 @@ public class Terrain {
         return tile[x][y].fertility;    
     }
     
+    public Boolean isExploited(int x, int y) {
+        return tile[x][y].exploited;
+    }
+    
+    public int getCityFertility(int x, int y) {
+        int total=0;
+        for (int i=-2; i<3; i++) {
+              for (int j=-2; j<3; j++) {
+                  int nx=i+x;
+                  int ny=j+y;
+                  if (nx>0 && nx<width && ny>0 && ny<height) {
+                      if (tile[nx][ny].fertility>0) total+=tile[nx][ny].fertility;
+                  }
+              }
+          }
+        return total;
+    }
+    
       public void drainFertility(int x, int y) {
           if (tile[x][y].fertility>0) {
             tile[x][y].fertility--;
             
               
+          }
+      }
+      
+      public void drainCityFertility(int x, int y, int usage) {
+          int drain=usage;
+          for (int i=-2; i<3; i++) {
+              for (int j=-2; j<3; j++) {
+                  int nx=i+x;
+                  int ny=j+y;
+                  if (nx>0 && nx<width && ny>0 && ny<height) {
+                      if (tile[nx][ny].fertility>0) {
+                          tile[nx][ny].fertility--;
+                          tile[nx][ny].exploited=true;
+                          drain--;
+                          if (drain<1) return;
+                      }
+                      
+                  }
+              }
           }
       }
     

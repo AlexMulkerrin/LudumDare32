@@ -13,6 +13,7 @@ public class LudumDare32 {
     Simulation sim;
     Player player;
     Timer timer;
+    
 
     public static void main(String[] args) {
         LudumDare32 program = new LudumDare32();
@@ -22,7 +23,7 @@ public class LudumDare32 {
     public LudumDare32() {
         sim = new Simulation(80,50,10);
         player = new Player(sim);
-        display = new DisplayFrame(sim,player);
+        display = new DisplayFrame(sim,player, this);
         
         player.linkObject(display);
     }
@@ -30,14 +31,18 @@ public class LudumDare32 {
     public void run() {
         
         timer = new Timer();
-        timer.schedule(new update(), 0, 1000);
+        timer.schedule(new UpdateTask(), 0, 100);
     }
     
-    public class update extends TimerTask {
+    public void update() {
+        sim.update();
+        display.update();
+    }
+    
+    public class UpdateTask extends TimerTask {
         @Override
         public void run() {
-            sim.update();
-            display.update();
+            update();
         }
     }
     

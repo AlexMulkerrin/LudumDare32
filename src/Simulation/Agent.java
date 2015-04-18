@@ -12,6 +12,8 @@ public class Agent {
     public int population;
     public String name;
     
+    public Boolean isNomadic;
+    
     private Simulation sim;
     private Terrain map;
 
@@ -24,31 +26,49 @@ public class Agent {
         map = location;
         sim = containingSim;
         name = randomTribeName();
+        isNomadic=true;
  
         population=50;
         
     }
     
     public void update() {
-        wander();
-        switch (map.getFertility(x,y)) {
-            case 0: {
-                map.drainFertility(x,y);
-                population-=1;
-                break;
+        if (isNomadic) {
+            // very slight chance to settle on their own
+            if (map.getCityFertility(x, y)>40) {
+                this.settle();
+            } else {
+                wander();
+                switch (map.getFertility(x,y)) {
+                    case 0: {
+                        map.drainFertility(x,y);
+                        population-=1;
+                        break;
+                    }
+                    case 1: {
+                        //unchanged;
+                        map.drainFertility(x,y);
+                        break;
+                    }
+                    case 2: {
+                        population+=2;
+                        map.drainFertility(x,y);
+                        if (population>150) population=150;
+                        break;
+                    }
+                }
             }
-            case 1: {
-                //unchanged;
-                map.drainFertility(x,y);
-                break;
+        } else {
+            int food = 100*map.getCityFertility(x,y); 
+            if (food>population) {
+                population+=5;
+            } else if (food==population) {
+                //population unchanged;
+            } else if (food<population) {
+                population-=5;  
             }
-            case 2: {
-                population+=2;
-                map.drainFertility(x,y);
-                if (population>150) population=150;
-                break;
-            }
-        }    
+            map.drainCityFertility(x,y,population/100);
+        }
     }
     
     public void wander() {
@@ -70,6 +90,11 @@ public class Agent {
                 
             }  
         }
+    }
+    
+    public void settle() {
+        isNomadic=false;
+        sim.log.add(sim.turn+": Tribe "+name+" has settled.");
     }
     
     private String randomTribeName() {

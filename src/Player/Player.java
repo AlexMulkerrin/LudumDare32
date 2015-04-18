@@ -3,6 +3,7 @@ package Player;
 import java.awt.event.*;
 import Simulation.Simulation;
 import Display.DisplayFrame;
+import Simulation.Agent;
 import javax.swing.SwingUtilities;
 /**
  *
@@ -11,11 +12,12 @@ import javax.swing.SwingUtilities;
 public class Player extends MouseAdapter {
     public int mouseX=0;
     public int mouseY=0;
-    public int brushType = 0;
+    public int brushType = 4;
     public int brushSize = 1;
     
     Simulation targetSim;
     DisplayFrame targetDisplay;
+    public Agent selectedAgent;
     
     public Player(Simulation sim) {
         targetSim=sim;   
@@ -29,9 +31,11 @@ public class Player extends MouseAdapter {
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
             brushType++;
-            if (brushType>3) brushType=0;
-        } else if (targetSim.mana>0) {
+            if (brushType>4) brushType=0;
+        } else if (brushType<4) {
             areaEffect();
+        } else if (brushType==4) { // select
+            changeSelected();
         }
         targetDisplay.repaint();
     }
@@ -45,8 +49,10 @@ public class Player extends MouseAdapter {
         
         if (mouseY<0) mouseY=0;
         if (mouseY>=targetSim.map.getHeight()) mouseY=targetSim.map.getHeight()-1;
-        if (targetSim.mana>0) {
+        if (brushType<4) {
             areaEffect();
+        } else if (brushType==4) { // select
+            changeSelected();
         }
         targetDisplay.repaint();
         
@@ -93,6 +99,21 @@ public class Player extends MouseAdapter {
             if (targetSim.map.setElevation(x,y,brushType)) {
                 targetSim.mana--;
             }
+        }
+    }
+    
+    public void changeSelected() {
+        if (targetSim.map.occupier[mouseX][mouseY]!=null) {
+            selectedAgent = targetSim.map.occupier[mouseX][mouseY];
+            targetDisplay.selectedDetailDisplay.targetAgent = selectedAgent;
+        }
+    }
+    
+    public void commandToSettle() {
+        if (selectedAgent!=null && targetSim.mana>0 && selectedAgent.isNomadic) {
+            selectedAgent.settle();
+            targetSim.mana--;
+            targetDisplay.repaint();
         }
     }
 

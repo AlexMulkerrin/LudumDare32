@@ -4,22 +4,30 @@ import Player.Player;
 import java.awt.*;
 import javax.swing.*;
 import Simulation.Simulation;
+import ludumdare32.LudumDare32;
 /**
  *
  * @author Alex Mulkerrin
  */
 public class DisplayFrame extends JFrame{
     public MapPanel mapDisplay;
-    StatPanel statDisplay;
-    LogPanel logDisplay;
-    DetailPanel detailDisplay;
+    public StatPanel statDisplay;
+    public LogPanel logDisplay;
+    public MouseDetailPanel mouseDetailDisplay;
+    public SelectedDetailPanel selectedDetailDisplay;
+    ButtonPanel buttonDisplay;
+    
     Simulation targetSim;
     Player targetPlayer;
+    LudumDare32 targetProgram;
     
-    public DisplayFrame(Simulation sim, Player player) {
+    public int animationTicks;
+    
+    public DisplayFrame(Simulation sim, Player player, LudumDare32 program) {
         super("Ludum Dare 32");
         targetSim = sim;
-        targetPlayer =player;
+        targetPlayer = player;
+        targetProgram = program;
         
         setLayout(new BorderLayout());
         
@@ -31,11 +39,15 @@ public class DisplayFrame extends JFrame{
         getContentPane().add(statDisplay,BorderLayout.EAST);
         
         logDisplay = new LogPanel(sim);
-        detailDisplay = new DetailPanel(sim, player);
+        mouseDetailDisplay = new MouseDetailPanel(sim, player);
+        selectedDetailDisplay = new SelectedDetailPanel(targetSim);
+        buttonDisplay = new ButtonPanel(targetProgram,targetPlayer);
         
         JPanel lowerPanel = new JPanel();
         lowerPanel.add(logDisplay);
-        lowerPanel.add(detailDisplay);
+        lowerPanel.add(mouseDetailDisplay);
+        lowerPanel.add(selectedDetailDisplay);
+        lowerPanel.add(buttonDisplay);
         getContentPane().add(lowerPanel,BorderLayout.SOUTH);
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,6 +59,8 @@ public class DisplayFrame extends JFrame{
         mapDisplay.repaint();
         statDisplay.repaint();
         logDisplay.repaint();
-        detailDisplay.repaint();
+        mouseDetailDisplay.repaint();
+        selectedDetailDisplay.repaint();
     }
+    
 }

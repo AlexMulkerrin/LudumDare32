@@ -9,17 +9,17 @@ import javax.swing.*;
  *
  * @author Alex Mulkerrin
  */
-public class DetailPanel extends JPanel {
+public class MouseDetailPanel extends JPanel {
     JTextArea details;
     Simulation targetSim;
     Player targetPlayer;
     
-    public DetailPanel(Simulation sim, Player player) {
+    public MouseDetailPanel(Simulation sim, Player player) {
         targetSim = sim;
         targetPlayer = player;
         
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(300,150));
+        setPreferredSize(new Dimension(200,150));
         
         add (new JLabel("Current Moused Over"));
         details = new JTextArea();
@@ -38,14 +38,18 @@ public class DetailPanel extends JPanel {
         int y=targetPlayer.mouseY;
         
         String contents = "Mouse position: "+x+","+y+"\n";
-        if (targetPlayer.brushType==0) {
-            contents += "Current power: sink land.\n";
-        } else if (targetPlayer.brushType==1) {
-            contents += "Current power: raise land.\n";
-        } else if (targetPlayer.brushType==2) {
-            contents += "Current power: raise hill.\n";
-        } else if (targetPlayer.brushType==3) {
-            contents += "Current power: raise mountain.\n";
+        contents += "Current power: ";
+        switch(targetPlayer.brushType) {
+            case 0: contents += "sink land.\n";
+                break;
+            case 1: contents += "raise land.\n";
+                break;
+            case 2: contents += "raise hill.\n";
+                break;
+            case 3: contents += "raise mountain.\n";
+                break;
+            case 4: contents += "Inspire tribe.\n";
+                break;
         }
         contents += "Power magnitute: "+targetPlayer.brushSize+"\n";
         contents += "Tile elevation: "+targetSim.map.getElevation(x,y)+"\n";
