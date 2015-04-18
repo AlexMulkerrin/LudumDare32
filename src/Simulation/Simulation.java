@@ -42,9 +42,33 @@ public class Simulation {
     
     public void update() {
         turn++;
-//        for (int i=0; i<unit.size(); i++) {
-//            unit.get(i).wander();
-//        }
+        for (int i=0; i<unit.size(); i++) {
+            Agent toUpdate = unit.get(i);
+            toUpdate.update();
+            if (toUpdate.population<1) {
+                unit.remove(i);
+                i--;
+            }
+        }
+        map.update(unit);
+    }
+    
+    public int getTotalPop() {
+        int totalPop=0;
+        for (int i=0; i<unit.size(); i++) {
+            Agent toView = unit.get(i);
+            totalPop+=toView.population;
+        }
+        return totalPop;
+    }
+    
+    public int getAveragePop() {
+        int totalPop=0;
+        for (int i=0; i<unit.size(); i++) {
+            Agent toView = unit.get(i);
+            totalPop+=toView.population;
+        }
+        return totalPop/unit.size();
     }
     
     private String randomName() {
