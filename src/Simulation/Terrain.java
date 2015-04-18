@@ -75,7 +75,7 @@ public class Terrain {
                 sx += choices[choice][0];
                 sy += choices[choice][1];
                 length--;
-                if (sx<border || sx>width-border || sy<border || sy>=height-border) {
+                if (sx<border || sx>=width-border || sy<border || sy>=height-border) {
                     insideBorder = false;
                 }
             }
@@ -148,6 +148,28 @@ public class Terrain {
             occupier[toSet.x][toSet.y]= toSet;
         }
         replenishFertility();
+        updateTotals();
+    }
+    
+    public void updateTotals() {
+        totalLand=0;
+        totalFertile=0;
+        totalAverage=0;
+        totalBarren=0;
+        for (int i=0; i<width; i++) {
+                for (int j=0; j<height; j++) {
+                    if (tile[i][j].elevation>0) {
+                        totalLand++;
+                        if (tile[i][j].fertility==2) {
+                            totalFertile++;
+                        } else if (tile[i][j].fertility==1) {
+                            totalAverage++;
+                        } else {
+                            totalBarren++;
+                        }
+                    }
+                }
+            }
     }
     
     public void replenishFertility() {
@@ -161,7 +183,30 @@ public class Terrain {
         }
     }
     
+   public Boolean setElevation(int x, int y, int brushType) {
+       Boolean success=false;
+       if (tile[x][y].elevation>brushType) {
+           tile[x][y].elevation--;
+           setFertility(x,y);
+           success=true;
+       } else if (tile[x][y].elevation<brushType) {
+           tile[x][y].elevation++;
+           setFertility(x,y);
+           success=true;
+       }
+       updateTotals();
+       return success;
+   }
    
+   public void setFertility(int x, int y) {
+        if (tile[x][y].elevation>0) {
+            int chance = 3-tile[x][y].elevation;
+            if (chance<0) chance=0;
+            tile[x][y].maxFertility = chance;
+            tile[x][y].fertility=0;
+
+        }
+   }
     
     
     

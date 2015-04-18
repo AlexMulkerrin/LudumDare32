@@ -49,7 +49,8 @@ class StatPanel extends JPanel{
         String contents ="World: "+targetSim.name+"\n";
         contents += "Seed: "+targetSim.seed+"\n";
         contents += "Size: "+targetSim.map.getWidth()+","+targetSim.map.getHeight()+"\n";
-        contents += "Turn: "+targetSim.turn;
+        contents += "Turn: "+targetSim.turn+"\n";
+        contents += "Current Mana: "+targetSim.mana+"\n";
         worldStats.setText(contents);
     }
     

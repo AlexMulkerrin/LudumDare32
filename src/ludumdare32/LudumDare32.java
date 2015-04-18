@@ -2,6 +2,7 @@ package ludumdare32;
 
 import Simulation.Simulation;
 import Display.DisplayFrame;
+import Player.Player;
 import java.util.*;
 /**
  *
@@ -10,6 +11,7 @@ import java.util.*;
 public class LudumDare32 {
     DisplayFrame display;
     Simulation sim;
+    Player player;
     Timer timer;
 
     public static void main(String[] args) {
@@ -19,13 +21,16 @@ public class LudumDare32 {
     
     public LudumDare32() {
         sim = new Simulation(80,50,10);
-        display = new DisplayFrame(sim);
+        player = new Player(sim);
+        display = new DisplayFrame(sim,player);
+        
+        player.linkObject(display);
     }
     
     public void run() {
         
         timer = new Timer();
-        timer.schedule(new update(), 0, 100);
+        timer.schedule(new update(), 0, 1000);
     }
     
     public class update extends TimerTask {

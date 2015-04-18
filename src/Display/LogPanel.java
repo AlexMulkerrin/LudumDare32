@@ -16,7 +16,7 @@ public class LogPanel extends JPanel {
         
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
-        setPreferredSize(new Dimension(100,100));
+        setPreferredSize(new Dimension(300,150));
         
         add (new JLabel("Event Log"));
         eventLog = new JTextArea();

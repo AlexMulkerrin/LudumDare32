@@ -14,6 +14,7 @@ public class Simulation {
     public ArrayList<Agent> unit;
     
     public int turn;
+    public int mana;
     
     public Simulation(int width, int height, int startingFactions) {
         
@@ -23,6 +24,7 @@ public class Simulation {
         name = randomWorldName();
         
         turn=0;
+        mana=1;
         
         log = new EventLog();
         
@@ -45,6 +47,7 @@ public class Simulation {
     
     public void update() {
         turn++;
+        mana++;
         for (int i=0; i<unit.size(); i++) {
             Agent toUpdate = unit.get(i);
             toUpdate.update();
@@ -55,6 +58,9 @@ public class Simulation {
             } else if(toUpdate.population>100) {
                 unit.add(map.createNewTribe(toUpdate.x, toUpdate.y));
                 toUpdate.population-=50;
+                Agent temp = unit.get(unit.size()-1);
+                log.add(turn+": Tribe "+toUpdate.name+
+                        " has created tribe "+temp.name+".");
             }
         }
         map.update(unit);

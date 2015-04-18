@@ -1,5 +1,6 @@
 package Display;
 
+import Player.Player;
 import java.awt.*;
 import javax.swing.*;
 import Simulation.Simulation;
@@ -9,12 +10,18 @@ import Simulation.Agent;
  *
  * @author Alex Mulkerrin
  */
-class MapPanel extends JPanel {
+public class MapPanel extends JPanel {
     Simulation targetSim;
-    int sqSize=10;
+    Player targetPlayer;
+    public int sqSize=10;
 
-    public MapPanel(Simulation sim) {
+    public MapPanel(Simulation sim, Player player) {
         targetSim = sim;
+        targetPlayer = player;
+        
+        addMouseListener(player);
+        addMouseMotionListener(player);
+        addMouseWheelListener(player);
         
         setPreferredSize(
                 new Dimension(
@@ -28,6 +35,7 @@ class MapPanel extends JPanel {
         super.paintComponent(g);
         paintTerrain(g);
         paintAgents(g);
+        paintMouseHover(g);
     }
     
     public void paintTerrain(Graphics g) {
@@ -61,6 +69,13 @@ class MapPanel extends JPanel {
             int y = toPaint.y;
             g.fillRect(x*sqSize+2, y*sqSize+2, sqSize-4, sqSize-4);
         }
+    }
+    
+    public void paintMouseHover(Graphics g) {
+        g.setColor(Color.red);
+        
+        g.drawRect(targetPlayer.mouseX*sqSize, targetPlayer.mouseY*sqSize,
+                sqSize, sqSize);
     }
     
 }

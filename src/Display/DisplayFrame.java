@@ -1,5 +1,6 @@
 package Display;
 
+import Player.Player;
 import java.awt.*;
 import javax.swing.*;
 import Simulation.Simulation;
@@ -8,18 +9,21 @@ import Simulation.Simulation;
  * @author Alex Mulkerrin
  */
 public class DisplayFrame extends JFrame{
-    MapPanel mapDisplay;
+    public MapPanel mapDisplay;
     StatPanel statDisplay;
     LogPanel logDisplay;
+    DetailPanel detailDisplay;
     Simulation targetSim;
+    Player targetPlayer;
     
-    public DisplayFrame(Simulation sim) {
+    public DisplayFrame(Simulation sim, Player player) {
         super("Ludum Dare 32");
         targetSim = sim;
+        targetPlayer =player;
         
         setLayout(new BorderLayout());
         
-        mapDisplay = new MapPanel(sim);
+        mapDisplay = new MapPanel(sim, player);
         JScrollPane scroller = new JScrollPane(mapDisplay);
         getContentPane().add(scroller,BorderLayout.CENTER);
         
@@ -27,10 +31,15 @@ public class DisplayFrame extends JFrame{
         getContentPane().add(statDisplay,BorderLayout.EAST);
         
         logDisplay = new LogPanel(sim);
-        getContentPane().add(logDisplay,BorderLayout.SOUTH);
+        detailDisplay = new DetailPanel(sim, player);
+        
+        JPanel lowerPanel = new JPanel();
+        lowerPanel.add(logDisplay);
+        lowerPanel.add(detailDisplay);
+        getContentPane().add(lowerPanel,BorderLayout.SOUTH);
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000,550);
+        setSize(1000,720);
         setVisible(true);
     }
     
@@ -38,5 +47,6 @@ public class DisplayFrame extends JFrame{
         mapDisplay.repaint();
         statDisplay.repaint();
         logDisplay.repaint();
+        detailDisplay.repaint();
     }
 }

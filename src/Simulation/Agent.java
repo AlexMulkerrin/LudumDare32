@@ -43,7 +43,7 @@ public class Agent {
                 break;
             }
             case 2: {
-                population+=5;
+                population+=2;
                 map.drainFertility(x,y);
                 if (population>150) population=150;
                 break;
