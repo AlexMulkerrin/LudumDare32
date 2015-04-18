@@ -52,15 +52,18 @@ public class MouseDetailPanel extends JPanel {
                 break;
         }
         contents += "Power magnitute: "+targetPlayer.brushSize+"\n";
-        contents += "Tile elevation: "+targetSim.map.getElevation(x,y)+"\n";
-        contents += "Tile fertility: "+targetSim.map.getFertility(x,y)+"\n";
-        if (targetSim.map.occupier[x][y]!=null) {
-            Agent hovered = targetSim.map.occupier[x][y];
-            contents += "Tribe: "+hovered.name+"\n";
-            contents += "population: "+hovered.population+"\n";
-        } else {
-            contents +="Unoccupied\n";
-        }
+        contents += "Tile properties:\n";
+        contents += "Elevation: "+targetSim.map.getElevation(x,y)+"\n";
+        contents += "Temperature: "+targetSim.map.getTemperature(x,y)+"\n";
+        contents += "Rainfall: "+targetSim.map.getRainfall(x,y)+"\n";
+        contents += "Fertility: "+targetSim.map.getFertility(x,y)+"\n";
+//        if (targetSim.map.occupier[x][y]!=null) {
+//            Agent hovered = targetSim.map.occupier[x][y];
+//            contents += "Tribe: "+hovered.name+"\n";
+//            contents += "population: "+hovered.population+"\n";
+//        } else {
+//            contents +="Unoccupied\n";
+//        }
         details.setText(contents);
     }
 }

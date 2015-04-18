@@ -7,6 +7,13 @@ import java.util.Random;
  * @author Alex Mulkerrin
  */
 public class Terrain {
+    // ordered area around city to exploit
+    private int[][] cityStencil = new int[][]{
+        {0,0},{0,-1},{1,0},{0,1},{-1,0},
+        {1,-1},{1,1},{-1,1},{-1,-1},{0,-2},
+        {2,0},{0,2},{-2,0},{2,-1},{2,1},
+        {1,2},{-1,2},{-2,1},{-2,-1},{-2,-1},
+    };
     private int width;
     private int height;
     private Tile tile[][];
@@ -14,6 +21,8 @@ public class Terrain {
     
     public int totalLand;
     public int totalFertile, totalAverage, totalBarren;
+    
+    public int mapTemperature=3;
     
     private Simulation sim;
     
@@ -29,6 +38,8 @@ public class Terrain {
     
     private class Tile {
         int elevation = 0;
+        int temperature = 0;
+        int rainfall = 0;
         int fertility = 0;
         int maxFertility = 0;
         Boolean exploited = false;
@@ -46,6 +57,8 @@ public class Terrain {
     public void generateWorld() {
         clearMap();
         generateHeightMap();
+        generateTemperature();
+        generateMapRainfall();
         generateFertility();
     }
     
@@ -93,7 +106,47 @@ public class Terrain {
         }
     }
     
-    //public void 
+    public void generateTemperature() {
+        int temp;
+        int scaling =(mapTemperature+3)*2;
+        for (int i=0; i<width; i++) {
+            for (int j=0; j<height; j++) {
+                temp = j-height/2; // latitude
+                temp = scaling*temp/height; //rescale from 0 to scale factor
+                temp = (int)(Math.abs(temp));
+                if (temp>4) temp=4;
+                tile[i][j].temperature=temp;
+                tile[i][j].rainfall=0;
+            }
+        }
+    }
+    
+    public void generateMapRainfall() {
+        for (int j=0; j<height; j++) {
+            int wet=0;
+            int temp =(Math.abs(height/2-j));
+            for (int i=0; i<width; i++) { //easterly winds
+                if (tile[i][j].elevation==0) {
+                    int yield = Math.abs(temp-height/4) + 8;
+                    if (yield>wet) wet++;
+                } else if (wet>0) {
+                    tile[i][j].rainfall=1;
+                    wet-=2+tile[i][j].elevation;
+                }
+            }
+            wet=0;
+            for (int i=width-1; i>=0; i--) { //westerly winds
+                if (tile[i][j].elevation==0) {
+                    int yield = Math.abs(temp-height/4) + 8;
+                    if (yield>wet) wet++;
+                } else if (wet>0) {
+                    tile[i][j].rainfall=1;
+                    wet-=2+tile[i][j].elevation;
+                }
+            }
+        }
+    }
+    
     
     public void generateFertility() {
         totalFertile=0;
@@ -103,6 +156,11 @@ public class Terrain {
             for (int j=0; j<height; j++) {
                 if (tile[i][j].elevation>0) {
                     int chance = 3-tile[i][j].elevation;
+                    int temp = tile[i][j].temperature;
+                    if (temp==0 || temp==4) chance=0;
+                    if (temp==1 || temp==3) chance--;
+                    if (tile[i][j].rainfall>0) chance++;
+                    if (chance>2) chance=2;
                     if (chance<0) chance=0;
                     tile[i][j].maxFertility = chance;
                     if (tile[i][j].maxFertility==2) {
@@ -116,6 +174,31 @@ public class Terrain {
                     }
                 }
                 
+            }
+        }
+    }
+    
+    public void climateChange() {
+       mapTemperature+= (int)(Math.random()*3)-1;
+       generateTemperature();
+       generateMapRainfall();
+       recalculateFertility();
+       updateTotals(); 
+    }
+    
+    public void recalculateFertility() {
+        for (int i=0; i<width; i++) {
+            for (int j=0; j<height; j++) {
+                if (tile[i][j].elevation>0) {
+                    int chance = 3-tile[i][j].elevation;
+                    int temp = tile[i][j].temperature;
+                    if (temp==0 || temp==4) chance=0;
+                    if (temp==1 || temp==3) chance--;
+                    if (tile[i][j].rainfall>0) chance++;
+                    if (chance>2) chance=2;
+                    if (chance<0) chance=0;
+                    tile[i][j].maxFertility = chance;
+                } 
             }
         }
     }
@@ -177,9 +260,13 @@ public class Terrain {
     public void replenishFertility() {
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
-                if (occupier[i][j]==null && tile[i][j].fertility<tile[i][j].maxFertility) {
+                if (tile[i][j].fertility<tile[i][j].maxFertility){//occupier[i][j]==null &&  {
                     int chance= (int)(Math.random()*20);
                     if (chance==0) tile[i][j].fertility++;
+                } else if (tile[i][j].fertility>tile[i][j].maxFertility) {
+                    //decay!
+                    int chance= (int)(Math.random()*2);
+                    if (chance==0) tile[i][j].fertility--;
                 }
             }
         }
@@ -203,6 +290,11 @@ public class Terrain {
    public void setFertility(int x, int y) {
         if (tile[x][y].elevation>0) {
             int chance = 3-tile[x][y].elevation;
+            int temp = tile[x][y].temperature;
+            if (temp==0 || temp==4) chance=0;
+            if (temp==1 || temp==3) chance--;
+            if (tile[x][y].rainfall>0) chance++;
+            if (chance>2) chance=2;
             if (chance<0) chance=0;
             tile[x][y].maxFertility = chance;
             tile[x][y].fertility=0;
@@ -224,6 +316,14 @@ public class Terrain {
         return tile[x][y].elevation;
     }
     
+    public int getTemperature(int x, int y) {
+        return tile[x][y].temperature;    
+    }
+    
+    public int getRainfall(int x, int y) {
+        return tile[x][y].rainfall;    
+    }
+    
     public int getFertility(int x, int y) {
         return tile[x][y].fertility;    
     }
@@ -234,15 +334,19 @@ public class Terrain {
     
     public int getCityFertility(int x, int y) {
         int total=0;
-        for (int i=-2; i<3; i++) {
-              for (int j=-2; j<3; j++) {
+//        int range=2;
+//        for (int i=-range; i<=range; i++) {
+//              for (int j=-range; j<=range; j++) {
+        for (int e=0; e<cityStencil.length; e++) {
+            int i=cityStencil[e][0];
+            int j=cityStencil[e][1];
                   int nx=i+x;
                   int ny=j+y;
                   if (nx>0 && nx<width && ny>0 && ny<height) {
                       if (tile[nx][ny].fertility>0) total+=tile[nx][ny].fertility;
                   }
               }
-          }
+//          }
         return total;
     }
     
@@ -256,8 +360,12 @@ public class Terrain {
       
       public void drainCityFertility(int x, int y, int usage) {
           int drain=usage;
-          for (int i=-2; i<3; i++) {
-              for (int j=-2; j<3; j++) {
+//          int range=2;
+//          for (int i=-range; i<=range; i++) {
+//              for (int j=-range; j<=range; j++) {
+        for (int e=0; e<cityStencil.length; e++) {
+            int i=cityStencil[e][0];
+            int j=cityStencil[e][1];
                   int nx=i+x;
                   int ny=j+y;
                   if (nx>0 && nx<width && ny>0 && ny<height) {
@@ -270,7 +378,7 @@ public class Terrain {
                       
                   }
               }
-          }
+//          }
       }
     
 }

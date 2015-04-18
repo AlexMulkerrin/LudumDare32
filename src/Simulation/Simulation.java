@@ -24,7 +24,7 @@ public class Simulation {
         name = randomWorldName();
         
         turn=0;
-        mana=10000;
+        mana=1;
         
         log = new EventLog();
         
@@ -47,6 +47,7 @@ public class Simulation {
     
     public void update() {
         turn++;
+        if (turn%50==0) map.climateChange();
         mana++;
         for (int i=0; i<unit.size(); i++) {
             Agent toUpdate = unit.get(i);
@@ -100,6 +101,8 @@ public class Simulation {
             return 0;
         }
     }
+    
+    
     
     private String randomWorldName() {
         char[] vowels = new char[]{'a','e','i','o','u'};

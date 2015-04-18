@@ -35,7 +35,7 @@ public class Agent {
     public void update() {
         if (isNomadic) {
             // very slight chance to settle on their own
-            if (map.getCityFertility(x, y)>40) {
+            if (map.getCityFertility(x, y)>30) {
                 this.settle();
             } else {
                 wander();
@@ -46,7 +46,7 @@ public class Agent {
                         break;
                     }
                     case 1: {
-                        //unchanged;
+                        population+=1;
                         map.drainFertility(x,y);
                         break;
                     }

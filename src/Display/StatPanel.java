@@ -51,6 +51,7 @@ class StatPanel extends JPanel{
         contents += "Size: "+targetSim.map.getWidth()+","+targetSim.map.getHeight()+"\n";
         contents += "Turn: "+targetSim.turn+"\n";
         contents += "Current Mana: "+targetSim.mana+"\n";
+        contents += "Current climate: "+targetSim.map.mapTemperature+"\n";
         worldStats.setText(contents);
     }
     

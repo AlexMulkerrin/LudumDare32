@@ -31,7 +31,7 @@ public class LudumDare32 {
     public void run() {
         
         timer = new Timer();
-        timer.schedule(new UpdateTask(), 0, 100);
+        timer.schedule(new UpdateTask(), 0, 1000);
     }
     
     public void update() {
