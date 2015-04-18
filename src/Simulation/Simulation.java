@@ -8,6 +8,7 @@ import java.util.*;
 public class Simulation {
     Random random;
     public int seed;
+    public EventLog log;
     public String name;
     public Terrain map;
     public ArrayList<Agent> unit;
@@ -19,12 +20,14 @@ public class Simulation {
         seed = (int)(System.nanoTime());
         random = new Random();
         random.setSeed(seed);
-        name = randomName();
+        name = randomWorldName();
         
         turn=0;
         
-        map = new Terrain(width,height);
-        map.generateWorld(random);
+        log = new EventLog();
+        
+        map = new Terrain(width,height,this);
+        map.generateWorld();
         
         unit = new ArrayList<>();
         for (int i=0; i<startingFactions; i++) {
@@ -47,7 +50,11 @@ public class Simulation {
             toUpdate.update();
             if (toUpdate.population<1) {
                 unit.remove(i);
+                log.add(turn+": Tribe "+toUpdate.name+" died.");
                 i--;
+            } else if(toUpdate.population>100) {
+                unit.add(map.createNewTribe(toUpdate.x, toUpdate.y));
+                toUpdate.population-=50;
             }
         }
         map.update(unit);
@@ -68,10 +75,14 @@ public class Simulation {
             Agent toView = unit.get(i);
             totalPop+=toView.population;
         }
-        return totalPop/unit.size();
+        if (unit.size()>0){
+            return totalPop/unit.size();
+        } else {
+            return 0;
+        }
     }
     
-    private String randomName() {
+    private String randomWorldName() {
         char[] vowels = new char[]{'a','e','i','o','u'};
         char[] consonants = new char[]{'p','t','k','m','n'};
         String text="", result="";

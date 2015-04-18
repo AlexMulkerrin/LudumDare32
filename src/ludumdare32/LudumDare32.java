@@ -18,7 +18,7 @@ public class LudumDare32 {
     }
     
     public LudumDare32() {
-        sim = new Simulation(80,50,100);
+        sim = new Simulation(80,50,10);
         display = new DisplayFrame(sim);
     }
     

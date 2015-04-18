@@ -14,11 +14,13 @@ public class Terrain {
     
     public int totalLand;
     public int totalFertile, totalAverage, totalBarren;
-    Random random;
     
-    public Terrain(int w, int h) {
+    private Simulation sim;
+    
+    public Terrain(int w, int h, Simulation containingSim) {
         width = w;
         height = h;
+        sim = containingSim;
         tile = new Tile[width][height];
         occupier = new Agent[width][height];
     }
@@ -28,6 +30,8 @@ public class Terrain {
     private class Tile {
         int elevation = 0;
         int fertility = 0;
+        int maxFertility = 0;
+        Boolean exploited = false;
     }
     
     public void clearMap() {
@@ -39,33 +43,77 @@ public class Terrain {
         }
     }
     
-    public void generateWorld(Random randomGenerator) {
-        random = randomGenerator;
+    public void generateWorld() {
         clearMap();
         generateHeightMap();
+        generateFertility();
     }
     
     public void generateHeightMap() {
         totalLand=0;
+        int border=2;
+        int desiredLand = (width-border*2)*(height-border*2)/2;
+        int[][] stamp = new int[][]{
+            {0,0},{1,0},{0,1},{-1,0},{0,-1}
+        };
+        int[][] choices = new int[][]{
+            {1,0},{0,1},{-1,0},{0,-1}
+        };
+        int[][] stencil;
+        
+        while (totalLand<desiredLand) {
+            stencil = new int[width][height];
+            int sx = sim.random.nextInt(width-2*border)+border;
+            int sy = sim.random.nextInt(height-2*border)+border;
+            int length = sim.random.nextInt(63)+1;
+            Boolean insideBorder = true;
+            while (length>0 && insideBorder) {
+                for (int e=0; e<stamp.length; e++) {
+                    stencil[sx+stamp[e][0]][sy+stamp[e][1]]=1;
+                }
+                int choice = sim.random.nextInt(choices.length);
+                sx += choices[choice][0];
+                sy += choices[choice][1];
+                length--;
+                if (sx<border || sx>width-border || sy<border || sy>=height-border) {
+                    insideBorder = false;
+                }
+            }
+            
+            for (int i=0; i<width; i++) {
+                for (int j=0; j<height; j++) {
+                    if (stencil[i][j]>0) {
+                        if (tile[i][j].elevation<1) {
+                            totalLand++;
+                        }
+                        tile[i][j].elevation += stencil[i][j];
+                    }
+                }
+            }
+        }
+    }
+    
+    public void generateFertility() {
         totalFertile=0;
         totalAverage=0;
         totalBarren=0;
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
-                if (i>0 && i<width-1 && j>0 && j<height-1) {
-                    tile[i][j].elevation = random.nextInt(2);
-                    if (tile[i][j].elevation>0) {
-                        totalLand++;
-                        tile[i][j].fertility = random.nextInt(3);
-                        if (tile[i][j].fertility==2) {
-                            totalFertile++;
-                        } else if (tile[i][j].fertility==1) {
-                            totalAverage++;
-                        } else {
-                            totalBarren++;
-                        }
+                if (tile[i][j].elevation>0) {
+                    int chance = 3-tile[i][j].elevation;
+                    if (chance<0) chance=0;
+                    tile[i][j].maxFertility = chance;
+                    if (tile[i][j].maxFertility==2) {
+                        tile[i][j].fertility=2;
+                        totalFertile++;
+                    } else if (tile[i][j].maxFertility==1) {
+                        tile[i][j].fertility=1;
+                        totalAverage++;
+                    } else {
+                        totalBarren++;
                     }
                 }
+                
             }
         }
     }
@@ -73,11 +121,18 @@ public class Terrain {
     public Agent createOccupier(int x, int y) {
         Agent toAdd;
         if (occupier[x][y]==null && tile[x][y].elevation>0) {
-            toAdd = new Agent(x,y, this);
+            toAdd = new Agent(x,y, this, sim);
             occupier[x][y] = toAdd;
             return toAdd;
         }
         return null;
+    }
+    
+    public Agent createNewTribe(int x, int y) {
+        Agent toAdd = new Agent(x,y, this, sim);
+        occupier[x][y] = toAdd;
+        return toAdd;
+
     }
     
     public Boolean checkValidMove(int x, int y) {
@@ -92,7 +147,21 @@ public class Terrain {
             Agent toSet = unit.get(i);
             occupier[toSet.x][toSet.y]= toSet;
         }
+        replenishFertility();
     }
+    
+    public void replenishFertility() {
+        for (int i=0; i<width; i++) {
+            for (int j=0; j<height; j++) {
+                if (occupier[i][j]==null && tile[i][j].fertility<tile[i][j].maxFertility) {
+                    int chance= (int)(Math.random()*20);
+                    if (chance==0) tile[i][j].fertility++;
+                }
+            }
+        }
+    }
+    
+   
     
     
     
@@ -111,5 +180,13 @@ public class Terrain {
     public int getFertility(int x, int y) {
         return tile[x][y].fertility;    
     }
+    
+      public void drainFertility(int x, int y) {
+          if (tile[x][y].fertility>0) {
+            tile[x][y].fertility--;
+            
+              
+          }
+      }
     
 }

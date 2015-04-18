@@ -59,7 +59,7 @@ class MapPanel extends JPanel {
             Agent toPaint = (Agent)targetSim.unit.get(i);
             int x = toPaint.x;
             int y = toPaint.y;
-            g.fillRect(x*sqSize+1, y*sqSize+1, sqSize-2, sqSize-2);
+            g.fillRect(x*sqSize+2, y*sqSize+2, sqSize-4, sqSize-4);
         }
     }
     

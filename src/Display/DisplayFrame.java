@@ -10,6 +10,7 @@ import Simulation.Simulation;
 public class DisplayFrame extends JFrame{
     MapPanel mapDisplay;
     StatPanel statDisplay;
+    LogPanel logDisplay;
     Simulation targetSim;
     
     public DisplayFrame(Simulation sim) {
@@ -25,6 +26,9 @@ public class DisplayFrame extends JFrame{
         statDisplay = new StatPanel(sim);
         getContentPane().add(statDisplay,BorderLayout.EAST);
         
+        logDisplay = new LogPanel(sim);
+        getContentPane().add(logDisplay,BorderLayout.SOUTH);
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000,550);
         setVisible(true);
@@ -33,5 +37,6 @@ public class DisplayFrame extends JFrame{
     public void update() {
         mapDisplay.repaint();
         statDisplay.repaint();
+        logDisplay.repaint();
     }
 }

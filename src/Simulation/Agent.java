@@ -10,35 +10,41 @@ public class Agent {
     public int oldx;
     public int oldy;
     public int population;
-    private int environ;
+    public String name;
     
+    private Simulation sim;
     private Terrain map;
 
     
-    public Agent(int placeX, int placeY, Terrain location) {
+    public Agent(int placeX, int placeY, Terrain location, Simulation containingSim ) {
         x = placeX;
         y = placeY;
         oldx = x;
         oldy = y;
         map = location;
-        environ = map.getFertility(x,y);
+        sim = containingSim;
+        name = randomTribeName();
+ 
         population=50;
         
     }
     
     public void update() {
         wander();
-        switch (environ) {
+        switch (map.getFertility(x,y)) {
             case 0: {
-                population-=5;
+                map.drainFertility(x,y);
+                population-=1;
                 break;
             }
             case 1: {
                 //unchanged;
+                map.drainFertility(x,y);
                 break;
             }
             case 2: {
                 population+=5;
+                map.drainFertility(x,y);
                 if (population>150) population=150;
                 break;
             }
@@ -55,14 +61,44 @@ public class Agent {
         if (choice==3) nx--;
         if (nx>0 && nx<map.getWidth() && ny>0 && ny<map.getHeight()) {
             if (map.checkValidMove(nx,ny)) {
+
                 oldx=x;
                 oldy=y;
                 x=nx;
                 y=ny;
-                environ=map.getFertility(x, y);
                 map.occupier[x][y] = this;
+                
             }  
         }
     }
+    
+    private String randomTribeName() {
+        char[] vowels = new char[]{'a','e','i','o','u'};
+        char[] consonants = new char[]{'p','t','k','m','n'};
+        String text="", result="";
+
+
+            text="";
+            int wordLength= sim.random.nextInt(4)+4;
+            int letterType = sim.random.nextInt(2);
+            for (int j=0; j<wordLength; j++) {
+                if (letterType==0) {
+                    text += randomChoice(consonants);
+                    letterType++;
+                } else {
+                    text += randomChoice(vowels);
+                    letterType=0;
+                }
+                if (j==0) text = text.toUpperCase();
+            }
+            result += text;
+        return result;
+    }
+    
+    public char randomChoice(char[] choices) {
+        int pick = sim.random.nextInt(choices.length);
+        return choices[pick];
+    }
+    
     
 }
