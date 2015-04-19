@@ -13,17 +13,25 @@ public class Simulation {
     public Terrain map;
     public ArrayList<Agent> unit;
     
+    
+    
     public int turn;
+    public int[] score;
+    public int maxScore;
     public int mana;
     
-    public Simulation(int width, int height, int startingFactions) {
+    public Simulation(int width, int height, int startingFactions, int seeded) {
         
-        seed = (int)(System.nanoTime());
+        seed=seeded;
         random = new Random();
         random.setSeed(seed);
         name = randomWorldName();
         
+        score=new int[501];
+        initializeScore();
+        
         turn=0;
+        
         mana=1;
         
         log = new EventLog();
@@ -42,6 +50,14 @@ public class Simulation {
                 
             }
             unit.add(toAdd);
+        }
+        score[turn]=getTotalPop();
+        if (score[turn]>maxScore) maxScore=score[turn];
+    }
+    
+    public void initializeScore() {
+        for (int i=0; i<score.length; i++) {
+            score[i]=0;
         }
     }
     
@@ -68,18 +84,20 @@ public class Simulation {
                 toUpdate.population-=50;
                 Agent temp = unit.get(unit.size()-1);
                 log.add(turn+": Tribe "+toUpdate.name+
-                        " has created tribe "+temp.name+".");
+                        " created tribe "+temp.name+".");
                 }
                 if ( toUpdate.population>200) {
                 unit.add(map.createNewTribe(toUpdate.x, toUpdate.y));
                 toUpdate.population-=50;
                 Agent temp = unit.get(unit.size()-1);
                 log.add(turn+": Settlement "+toUpdate.name+
-                        " has created tribe "+temp.name+".");
+                        " created tribe "+temp.name+".");
                 }
             }
         }
         map.update(unit);
+        score[turn]=getTotalPop();
+        if (score[turn]>maxScore) maxScore=score[turn];
     }
     
     public int getTotalPop() {

@@ -42,6 +42,9 @@ public class SelectedDetailPanel extends JPanel{
             contents += "population: "+targetAgent.population+"\n";
             if (targetAgent.isNomadic) {
                 contents += "Are currently nomads.\n";
+                contents +="There is enough food for: ";
+            contents +=50*targetSim.map.getCityFertility(targetAgent.x,targetAgent.y);
+            contents +=" nearby.\n";
             } else {
                 contents += "Have settled down.\n";
                             contents +="Have enough food for: ";

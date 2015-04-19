@@ -17,7 +17,7 @@ public class Player extends MouseAdapter {
     
     Simulation targetSim;
     DisplayFrame targetDisplay;
-    public Agent selectedAgent;
+    public Agent selectedAgent=null;
     
     public Player(Simulation sim) {
         targetSim=sim;   
@@ -30,8 +30,8 @@ public class Player extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-            brushType++;
-            if (brushType>4) brushType=0;
+            brushType=4;
+            //if (brushType>4) brushType=0;
         } else if (brushType<4) {
             areaEffect();
         } else if (brushType==4) { // select
@@ -107,6 +107,28 @@ public class Player extends MouseAdapter {
             selectedAgent = targetSim.map.occupier[mouseX][mouseY];
             targetDisplay.selectedDetailDisplay.targetAgent = selectedAgent;
         }
+    }
+    
+    public void nextAgent() {
+        int found=-1;
+        if (selectedAgent==null) found=0;
+        Boolean passed=false;
+        for (int i=0; i<targetSim.unit.size(); i++) {
+            Agent toCompare =targetSim.unit.get(i);
+            if (toCompare.equals(selectedAgent)) {
+                passed=true;
+                if (i==targetSim.unit.size()-1) found=0;
+                
+            } else {
+                if (found==-1 && passed) {
+                    found=i;
+                }
+            }
+        }
+        if (found!=-1) {
+            selectedAgent = targetSim.unit.get(found);
+        }
+        targetDisplay.selectedDetailDisplay.targetAgent = selectedAgent;
     }
     
     public void commandToSettle() {

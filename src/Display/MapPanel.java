@@ -57,16 +57,16 @@ public class MapPanel extends JPanel {
         addMouseWheelListener(player);
         
         try {
-            hillSprite = ImageIO.read(new File(getClass().getResource("/Resources/hill.png").toURI()));
-            mountainSprite = ImageIO.read(new File(getClass().getResource("/Resources/mountain.png").toURI()));
-            treeSprite = ImageIO.read(new File(getClass().getResource("/Resources/trees.png").toURI()));
-            shrubSprite = ImageIO.read(new File(getClass().getResource("/Resources/shrubs.png").toURI()));
-            settlementSprite = ImageIO.read(new File(getClass().getResource("/Resources/settlement.png").toURI()));
-            nomadSprite = ImageIO.read(new File(getClass().getResource("/Resources/nomad.png").toURI()));
-            skullSprite = ImageIO.read(new File(getClass().getResource("/Resources/skull.png").toURI()));
-            ruinSprite = ImageIO.read(new File(getClass().getResource("/Resources/ruin.png").toURI()));
-            cropSprite = ImageIO.read(new File(getClass().getResource("/Resources/crops.png").toURI()));
-        } catch (IOException | URISyntaxException ex) {
+            hillSprite = ImageIO.read(getClass().getResource("/Resources/hill.png"));
+            mountainSprite = ImageIO.read(getClass().getResource("/Resources/mountain.png"));
+            treeSprite = ImageIO.read(getClass().getResource("/Resources/trees.png"));
+            shrubSprite = ImageIO.read(getClass().getResource("/Resources/shrubs.png"));
+            settlementSprite = ImageIO.read(getClass().getResource("/Resources/settlement.png"));
+            nomadSprite = ImageIO.read(getClass().getResource("/Resources/nomad.png"));
+            skullSprite = ImageIO.read(getClass().getResource("/Resources/skull.png"));
+            ruinSprite = ImageIO.read(getClass().getResource("/Resources/ruin.png"));
+            cropSprite = ImageIO.read(getClass().getResource("/Resources/crops.png"));
+        } catch (IOException ex) {
         }
 
 
@@ -88,7 +88,7 @@ public class MapPanel extends JPanel {
     
     public void paintTerrain(Graphics g) {
         g.setColor(Color.decode(palette[0]));
-        g.fillRect(0, 0, getWidth(), getHeight());
+        g.fillRect(0, 0, sqSize*targetSim.map.getWidth(), sqSize*targetSim.map.getHeight());
         g.setColor(Color.BLACK);
         for (int i=0; i<targetSim.map.getWidth(); i++) {
             for (int j=0; j<targetSim.map.getHeight(); j++) {
@@ -164,6 +164,12 @@ public class MapPanel extends JPanel {
         
         g.drawRect(targetPlayer.mouseX*sqSize, targetPlayer.mouseY*sqSize,
                 sqSize, sqSize);
+        
+        if (targetPlayer.selectedAgent!=null) {
+            g.setColor(Color.green);
+            g.drawRect(targetPlayer.selectedAgent.x*sqSize, 
+                    targetPlayer.selectedAgent.y*sqSize,sqSize, sqSize);
+        }
     }
     
 }

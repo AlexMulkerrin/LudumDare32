@@ -4,28 +4,47 @@ import Simulation.Simulation;
 import Display.DisplayFrame;
 import Player.Player;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author Alex Mulkerrin
  */
 public class LudumDare32 {
-    MenuFrame mainMenu;
-    DisplayFrame display;
-    Simulation sim;
+    public MenuFrame mainMenu;
+    public DisplayFrame display;
+    public Simulation sim;
     Player player;
-    Timer timer;
+    public Timer timer;
     TimerTask updater;
+    int seed;
     
 
     public static void main(String[] args) {
         LudumDare32 program = new LudumDare32();
-        program.run();
+        //program.run();
     }
     
     public LudumDare32() {
-        sim = new Simulation(80,50,10);
+        seed = (int)(System.nanoTime());
+        sim = new Simulation(80,50,10,seed);
+        player = new Player(sim);
+        display = new DisplayFrame(sim,player, this);
+        
+        player.linkObject(display);
+    }
+    
+    public void reset() {
+        mainMenu.dispose();
+        seed = (int)(System.nanoTime());
+        sim = new Simulation(80,50,10,seed);
+        player = new Player(sim);
+        display = new DisplayFrame(sim,player, this);
+        
+        player.linkObject(display);
+    }
+    
+    public void resetWithSeed() {
+        mainMenu.dispose();
+        sim = new Simulation(80,50,10,seed);
         player = new Player(sim);
         display = new DisplayFrame(sim,player, this);
         
@@ -36,7 +55,7 @@ public class LudumDare32 {
         
         timer = new Timer();
         updater =new UpdateTask();
-        timer.schedule(updater, 0, 1000);
+        timer.schedule(updater, 0, 10);
     }
     
     public void update() {
@@ -60,7 +79,7 @@ public class LudumDare32 {
     }
     
     public void gameEnd(int score) {
-        mainMenu = new MenuFrame(score);
+        mainMenu = new MenuFrame(this, score);
     }
     
 }

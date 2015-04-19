@@ -10,6 +10,7 @@ public class Agent {
     public int oldx;
     public int oldy;
     public int population;
+    public int index;
     public String name;
     
     public Boolean isNomadic;

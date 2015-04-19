@@ -11,8 +11,8 @@ public class Terrain {
     private int[][] cityStencil = new int[][]{
         {0,0},{0,-1},{1,0},{0,1},{-1,0},
         {1,-1},{1,1},{-1,1},{-1,-1},{0,-2},
-        {2,0},{0,2},{-2,0},{2,-1},{2,1},
-        {1,2},{-1,2},{-2,1},{-2,-1},{-2,-1},
+        {2,0},{0,2},{-2,0},{1,-2},{2,-1},{2,1},
+        {1,2},{-1,2},{-2,1},{-2,-1},{-1,-2},
     };
     private int width;
     private int height;
@@ -22,7 +22,8 @@ public class Terrain {
     public int totalLand;
     public int totalFertile, totalAverage, totalBarren;
     
-    public int mapTemperature=3;
+    public int mapTempTendency;
+    public int mapTemperature;
     
     private Simulation sim;
     
@@ -71,6 +72,13 @@ public class Terrain {
     
     public void generateWorld() {
         clearMap();
+        Boolean challenge = sim.random.nextBoolean();
+        if (challenge){
+            mapTempTendency=-1;
+        } else {
+            mapTempTendency=1;
+        }
+        mapTemperature=3;
         generateHeightMap();
         identifyCoast();
         generateTemperature();
@@ -129,6 +137,7 @@ public class Terrain {
         int[] mask = new int[]{1,2,4,8};
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
+                tile[i][j].edge=0;
                 if (tile[i][j].elevation==0) {
                     for (int e=0; e<adjacent.length; e++) {
                         int nx=i+adjacent[e][0];
@@ -154,7 +163,7 @@ public class Terrain {
                 temp = (int)(Math.abs(temp));
                 if (temp>4) temp=4;
                 tile[i][j].temperature=temp;
-                tile[i][j].rainfall=0;
+                //tile[i][j].rainfall=0;
             }
         }
     }
@@ -164,6 +173,7 @@ public class Terrain {
             int wet=0;
             int temp =(Math.abs(height/2-j));
             for (int i=0; i<width; i++) { //easterly winds
+                tile[i][j].rainfall=0; // reset rainfall
                 if (tile[i][j].elevation==0) {
                     int yield = Math.abs(temp-height/4) + 8;
                     if (yield>wet) wet++;
@@ -210,7 +220,10 @@ public class Terrain {
     }
     
     public void climateChange() {
-       mapTemperature+= (int)(Math.random()*3)-1;
+        int change = (int)(Math.random()*3)-1;
+        if (change==0) change+= (int)(Math.random()*2)*mapTempTendency;
+        mapTemperature+= change;
+       
        generateTemperature();
        generateMapRainfall();
        recalculateFertility();
@@ -230,7 +243,7 @@ public class Terrain {
     public Agent createOccupier(int x, int y) {
         Agent toAdd;
         if (occupier[x][y]==null && tile[x][y].elevation>0) {
-            toAdd = new Agent(x,y, this, sim);
+            toAdd = new Agent(x, y, this, sim);
             occupier[x][y] = toAdd;
             return toAdd;
         }
@@ -300,23 +313,51 @@ public class Terrain {
        Boolean success=false;
        if (tile[x][y].elevation>brushType) {
            tile[x][y].elevation--;
-           setFertility(x,y);
+           calcFertility(x,y);
+           calcAdjacent(x,y);
            success=true;
        } else if (tile[x][y].elevation<brushType) {
            tile[x][y].elevation++;
-           setFertility(x,y);
+           calcFertility(x,y);
+           calcAdjacent(x,y);
            success=true;
        }
-       updateTotals();
+       generateMapRainfall();
+       recalculateFertility();
+       updateTotals(); 
        return success;
    }
    
-   public void setFertility(int x, int y) {
+   public void calcFertility(int x, int y) {
         if (tile[x][y].elevation>0) {
             tile[x][y].maxFertility= tile[x][y].calculateFertility();
             tile[x][y].fertility=0;
 
         }
+   }
+   
+   public void calcAdjacent(int x, int y) {
+       //kludge!
+       // I don't need to recalculate the entire maps edges but just the ones near the effect...
+       // too much work for now...
+       identifyCoast();
+       
+//       if (tile[x][y].elevation>0) {
+//           tile[x][y].edge=0;
+//       } else {
+//           int[][] adjacent = new int[][]{{1,0},{0,1},{-1,0},{0,-1}};
+//            int[] mask = new int[]{1,2,4,8};
+//
+//            for (int e=0; e<adjacent.length; e++) {
+//                int nx=x+adjacent[e][0];
+//                int ny=y+adjacent[e][1];
+//                if (nx>0 && nx<width && ny>0 && ny<height) {
+//                    if (tile[nx][ny].elevation>0) {
+//                        tile[x][y].edge += mask[e];
+//                    }
+//                }
+//            }   
+//       }
    }
    
    public void setRemains(int x, int y, int type) {

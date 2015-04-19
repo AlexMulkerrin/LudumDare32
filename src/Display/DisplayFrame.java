@@ -53,6 +53,7 @@ public class DisplayFrame extends JFrame{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000,720);
         setVisible(true);
+        setLocationRelativeTo(null);
     }
     
     public void update() {
