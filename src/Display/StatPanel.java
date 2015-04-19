@@ -8,7 +8,7 @@ import Simulation.Simulation;
  *
  * @author Alex Mulkerrin
  */
-class StatPanel extends JPanel{
+public class StatPanel extends JPanel{
     JTextArea worldStats;
     JTextArea landStats;
     JTextArea factionStats;

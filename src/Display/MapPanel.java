@@ -5,6 +5,11 @@ import java.awt.*;
 import javax.swing.*;
 import Simulation.Simulation;
 import Simulation.Agent;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URISyntaxException;
+
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -18,6 +23,8 @@ public class MapPanel extends JPanel {
                                     //ice?      coast
                                     "#ffffff","#B4DAF7"
     };
+    BufferedImage hillSprite;
+    BufferedImage mountainSprite;
     
     Simulation targetSim;
     Player targetPlayer;
@@ -30,6 +37,14 @@ public class MapPanel extends JPanel {
         addMouseListener(player);
         addMouseMotionListener(player);
         addMouseWheelListener(player);
+        
+        try {
+            hillSprite = ImageIO.read(new File(getClass().getResource("/Resources/hill.png").toURI()));
+            mountainSprite = ImageIO.read(new File(getClass().getResource("/Resources/mountain.png").toURI()));
+        } catch (IOException | URISyntaxException ex) {
+        }
+
+
         
         setPreferredSize(
                 new Dimension(
@@ -68,10 +83,12 @@ public class MapPanel extends JPanel {
                     g.fillRect(i*sqSize, j*sqSize, sqSize, sqSize);
                     g.setColor(Color.BLACK);
                     if (elev==2) {
-                       g.fillRect(i*sqSize+4, j*sqSize+4, sqSize-8, sqSize-8); 
+                        g.drawImage(hillSprite, i*sqSize, j*sqSize, this);
+                       //g.fillRect(i*sqSize+4, j*sqSize+4, sqSize-8, sqSize-8); 
                     }
                     if (elev==3) {
-                       g.fillRect(i*sqSize+3, j*sqSize+3, sqSize-6, sqSize-6); 
+                        g.drawImage(mountainSprite, i*sqSize, j*sqSize, this);
+                       //g.fillRect(i*sqSize+3, j*sqSize+3, sqSize-6, sqSize-6); 
                     }
                 }
             }
