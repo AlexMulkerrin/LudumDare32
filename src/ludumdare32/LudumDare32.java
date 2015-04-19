@@ -21,7 +21,7 @@ public class LudumDare32 {
 
     public static void main(String[] args) {
         LudumDare32 program = new LudumDare32();
-        //program.run();
+        program.run();
     }
     
     public LudumDare32() {
@@ -36,15 +36,19 @@ public class LudumDare32 {
         
         timer = new Timer();
         updater =new UpdateTask();
-        timer.schedule(updater, 0, 10);
+        timer.schedule(updater, 0, 1000);
     }
     
     public void update() {
         sim.update();
         display.update();
-        if (sim.turn>=500 || sim.getTotalPop()<=0) {
+        if (sim.turn>=500 ){
             timer.cancel();
-            gameEnd();
+            gameEnd(sim.getTotalPop());
+        } 
+        if (sim.getTotalPop()<=0) {
+            timer.cancel();
+            gameEnd(0);
         }
     }
     
@@ -55,8 +59,8 @@ public class LudumDare32 {
         }
     }
     
-    public void gameEnd() {
-        mainMenu = new MenuFrame();
+    public void gameEnd(int score) {
+        mainMenu = new MenuFrame(score);
     }
     
 }

@@ -38,11 +38,26 @@ public class Terrain {
     
     private class Tile {
         int elevation = 0;
+        int edge = 0;
         int temperature = 0;
         int rainfall = 0;
         int fertility = 0;
         int maxFertility = 0;
         Boolean exploited = false;
+        int remains = 0;
+        
+        public int calculateFertility() {
+            int value=3-elevation;
+            
+                    if (temperature==0) value=0;
+                    if (temperature==1) value--;
+                    if (temperature==3) value-=2;
+                    if (rainfall>0) value++;
+                    if (temperature==4) value=0;
+                    if (value>2) value=2;
+                    if (value<0) value=0;
+            return value;
+        }
     }
     
     public void clearMap() {
@@ -57,6 +72,7 @@ public class Terrain {
     public void generateWorld() {
         clearMap();
         generateHeightMap();
+        identifyCoast();
         generateTemperature();
         generateMapRainfall();
         generateFertility();
@@ -100,6 +116,28 @@ public class Terrain {
                             totalLand++;
                         }
                         tile[i][j].elevation += stencil[i][j];
+                    }
+                }
+            }
+        }
+    }
+    
+    public void identifyCoast() {
+        int[][] adjacent = new int[][]{
+            {1,0},{0,1},{-1,0},{0,-1}
+        };
+        int[] mask = new int[]{1,2,4,8};
+        for (int i=0; i<width; i++) {
+            for (int j=0; j<height; j++) {
+                if (tile[i][j].elevation==0) {
+                    for (int e=0; e<adjacent.length; e++) {
+                        int nx=i+adjacent[e][0];
+                        int ny=j+adjacent[e][1];
+                        if (nx>0 && nx<width && ny>0 && ny<height) {
+                            if (tile[nx][ny].elevation>0) {
+                                tile[i][j].edge += mask[e];
+                            }
+                        }
                     }
                 }
             }
@@ -155,14 +193,7 @@ public class Terrain {
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
                 if (tile[i][j].elevation>0) {
-                    int chance = 3-tile[i][j].elevation;
-                    int temp = tile[i][j].temperature;
-                    if (temp==0 || temp==4) chance=0;
-                    if (temp==1 || temp==3) chance--;
-                    if (tile[i][j].rainfall>0) chance++;
-                    if (chance>2) chance=2;
-                    if (chance<0) chance=0;
-                    tile[i][j].maxFertility = chance;
+                    tile[i][j].maxFertility= tile[i][j].calculateFertility();
                     if (tile[i][j].maxFertility==2) {
                         tile[i][j].fertility=2;
                         totalFertile++;
@@ -190,14 +221,7 @@ public class Terrain {
         for (int i=0; i<width; i++) {
             for (int j=0; j<height; j++) {
                 if (tile[i][j].elevation>0) {
-                    int chance = 3-tile[i][j].elevation;
-                    int temp = tile[i][j].temperature;
-                    if (temp==0 || temp==4) chance=0;
-                    if (temp==1 || temp==3) chance--;
-                    if (tile[i][j].rainfall>0) chance++;
-                    if (chance>2) chance=2;
-                    if (chance<0) chance=0;
-                    tile[i][j].maxFertility = chance;
+                    tile[i][j].maxFertility= tile[i][j].calculateFertility();
                 } 
             }
         }
@@ -289,17 +313,14 @@ public class Terrain {
    
    public void setFertility(int x, int y) {
         if (tile[x][y].elevation>0) {
-            int chance = 3-tile[x][y].elevation;
-            int temp = tile[x][y].temperature;
-            if (temp==0 || temp==4) chance=0;
-            if (temp==1 || temp==3) chance--;
-            if (tile[x][y].rainfall>0) chance++;
-            if (chance>2) chance=2;
-            if (chance<0) chance=0;
-            tile[x][y].maxFertility = chance;
+            tile[x][y].maxFertility= tile[x][y].calculateFertility();
             tile[x][y].fertility=0;
 
         }
+   }
+   
+   public void setRemains(int x, int y, int type) {
+       tile[x][y].remains=type;
    }
     
     
@@ -316,6 +337,10 @@ public class Terrain {
         return tile[x][y].elevation;
     }
     
+    public int getEdge(int x, int y) {
+        return tile[x][y].edge;
+    }
+    
     public int getTemperature(int x, int y) {
         return tile[x][y].temperature;    
     }
@@ -324,8 +349,16 @@ public class Terrain {
         return tile[x][y].rainfall;    
     }
     
+    public int getMaxFertility(int x, int y) {
+        return tile[x][y].maxFertility;    
+    }
+    
     public int getFertility(int x, int y) {
         return tile[x][y].fertility;    
+    }
+    
+    public int getRemains(int x, int y) {
+        return tile[x][y].remains;    
     }
     
     public Boolean isExploited(int x, int y) {
@@ -353,6 +386,7 @@ public class Terrain {
       public void drainFertility(int x, int y) {
           if (tile[x][y].fertility>0) {
             tile[x][y].fertility--;
+            tile[x][y].exploited=false;
             
               
           }

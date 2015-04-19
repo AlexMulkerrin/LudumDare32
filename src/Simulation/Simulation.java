@@ -55,8 +55,10 @@ public class Simulation {
             if (toUpdate.population<1) {
                 unit.remove(i);
                 if (toUpdate.isNomadic) {
+                    map.setRemains(toUpdate.x, toUpdate.y, 1);
                     log.add(turn+": Tribe "+toUpdate.name+" died.");
                 } else {
+                    map.setRemains(toUpdate.x, toUpdate.y, 2);
                     log.add(turn+": Settlement "+toUpdate.name+" died.");
                 }
                 i--;
