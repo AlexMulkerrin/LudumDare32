@@ -43,6 +43,9 @@ public class MapPanel extends JPanel {
     BufferedImage skullSprite;
     BufferedImage ruinSprite;
     BufferedImage cropSprite;
+    BufferedImage powerSprite;
+    BufferedImage noPowerSprite;
+    BufferedImage fightSprite;
     
     Simulation targetSim;
     Player targetPlayer;
@@ -66,6 +69,9 @@ public class MapPanel extends JPanel {
             skullSprite = ImageIO.read(getClass().getResource("/Resources/skull.png"));
             ruinSprite = ImageIO.read(getClass().getResource("/Resources/ruin.png"));
             cropSprite = ImageIO.read(getClass().getResource("/Resources/crops.png"));
+            powerSprite = ImageIO.read(getClass().getResource("/Resources/icon.png"));
+            noPowerSprite = ImageIO.read(getClass().getResource("/Resources/noPower.png"));
+            fightSprite = ImageIO.read(getClass().getResource("/Resources/fighting.png"));
         } catch (IOException ex) {
         }
 
@@ -148,9 +154,14 @@ public class MapPanel extends JPanel {
             int x = toPaint.x;
             int y = toPaint.y;
             if (toPaint.isNomadic) {
-                g.setColor(Color.orange);
-                g.fillRect(x*sqSize+2, y*sqSize+2, sqSize-4, sqSize-4);
+                if (toPaint.isGoing) {
+                    g.setColor(Color.cyan);
+                    g.fillRect(x*sqSize+1, y*sqSize+1, sqSize-2, sqSize-2);
+                }
                 g.drawImage(nomadSprite, x*sqSize, y*sqSize, this);
+                if (toPaint.isFighting) {
+                    g.drawImage(fightSprite, x*sqSize, y*sqSize, this);
+                }
             } else {
                 //g.setColor(Color.red);
                 g.drawImage(settlementSprite, x*sqSize, y*sqSize, this);
@@ -169,6 +180,14 @@ public class MapPanel extends JPanel {
             g.setColor(Color.green);
             g.drawRect(targetPlayer.selectedAgent.x*sqSize, 
                     targetPlayer.selectedAgent.y*sqSize,sqSize, sqSize);
+        }
+        
+        if (targetPlayer.brushType!=4) {
+            if (targetSim.mana>0) {
+                g.drawImage(powerSprite, targetPlayer.mouseX*sqSize+sqSize, targetPlayer.mouseY*sqSize-sqSize, this);
+            } else {
+                g.drawImage(noPowerSprite, targetPlayer.mouseX*sqSize+sqSize, targetPlayer.mouseY*sqSize-sqSize, this);
+            }
         }
     }
     

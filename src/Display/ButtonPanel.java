@@ -58,7 +58,7 @@ public class ButtonPanel extends JPanel{
         buttonBox.add(button);
         
         button = new JButton("go to...");
-        //button.addActionListener(new settleButton());
+        button.addActionListener(new selectPower(5));
         buttonBox.add(button);
         
         button = new JButton("raise mountain");

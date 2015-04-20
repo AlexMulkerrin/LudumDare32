@@ -24,7 +24,8 @@ public class DisplayFrame extends JFrame{
     public int animationTicks;
     
     public DisplayFrame(Simulation sim, Player player, LudumDare32 program) {
-        super("Ludum Dare 32");
+        super("Ludum Dare 32 entry: Nature's Assault");
+        setIconImage(new ImageIcon(getClass().getResource("/Resources/icon.png")).getImage());
         targetSim = sim;
         targetPlayer = player;
         targetProgram = program;

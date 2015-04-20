@@ -243,7 +243,7 @@ public class Terrain {
     public Agent createOccupier(int x, int y) {
         Agent toAdd;
         if (occupier[x][y]==null && tile[x][y].elevation>0) {
-            toAdd = new Agent(x, y, this, sim);
+            toAdd = new Agent(x, y, this, sim, false);
             occupier[x][y] = toAdd;
             return toAdd;
         }
@@ -251,16 +251,36 @@ public class Terrain {
     }
     
     public Agent createNewTribe(int x, int y) {
-        Agent toAdd = new Agent(x,y, this, sim);
+        Agent toAdd = new Agent(x,y, this, sim, true);
         occupier[x][y] = toAdd;
         return toAdd;
 
     }
     
-    public Boolean checkValidMove(int x, int y) {
+    public Boolean checkValidMove(int x, int y, Agent mover) {
         Boolean success = false;
-        if (tile[x][y].elevation>0 && occupier[x][y]==null) success=true;
+        if (tile[x][y].elevation>0 ) {
+            if (occupier[x][y]!=null) {
+                success=fight(mover,occupier[x][y]);
+            } else {
+                success=true;
+            }
+        } 
         return success;
+    }
+    
+    public Boolean fight(Agent aggressor, Agent defender) {
+        sim.log.add("Tribe "+aggressor.name+" attacks "+defender.name+"!");
+        int strength = aggressor.population/2;
+        aggressor.isFighting=true;
+        defender.isFighting=true;
+        aggressor.population-=defender.population/2;
+        defender.population-=strength;
+        if (aggressor.population>0) {
+            return true; 
+        }else {
+            return false;
+        }
     }
     
     public void update(ArrayList<Agent> unit) {

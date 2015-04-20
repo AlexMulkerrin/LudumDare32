@@ -12,15 +12,15 @@ class MenuFrame extends JFrame{
     LudumDare32 targetProgram;
     
     public MenuFrame(LudumDare32 program, int score) {
+        super("Game Over");
+        setIconImage(new ImageIcon(getClass().getResource("/Resources/icon.png")).getImage());
         targetProgram = program;
         setLayout(new BorderLayout());
-        setLocationRelativeTo(null);
         
         if (score<=0) {
-            getContentPane().add(new JLabel("Civilization has been destroyed"),BorderLayout.NORTH);
+            getContentPane().add(new JLabel(" Civilization has been destroyed"),BorderLayout.NORTH);
         } else {
-            getContentPane().add(new JLabel("This era is over, congratulations!"),BorderLayout.NORTH);
-            getContentPane().add(new JLabel(score+" people survived."),BorderLayout.CENTER);
+            getContentPane().add(new JLabel(" This era is over, congratulations!"),BorderLayout.NORTH);
          }
         
         getContentPane().add(new ScoreHistogram(),BorderLayout.CENTER);
@@ -28,15 +28,15 @@ class MenuFrame extends JFrame{
         JPanel buttons = new JPanel(new GridLayout(0,3));
         
         JButton button = new JButton("retry");
-        button.addActionListener(new retryMap());
+        button.addActionListener(new RetryMapListener());
         buttons.add(button);
         
         button = new JButton("new world");
-        button.addActionListener(new newMap());
+        button.addActionListener(new NewMapListener());
         buttons.add(button);
         
         button = new JButton("quit");
-        //button.addActionListener(new settleButton());
+        button.addActionListener(new QuitButtonListener());
         buttons.add(button);
         getContentPane().add(buttons,BorderLayout.SOUTH);
         
@@ -106,7 +106,7 @@ class MenuFrame extends JFrame{
     
 
     
-    private class retryMap implements ActionListener {
+    private class RetryMapListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -115,12 +115,19 @@ class MenuFrame extends JFrame{
         }
     }
     
-    private class newMap implements ActionListener {
+    private class NewMapListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             targetProgram.display.dispose();
             targetProgram.reset();
+        }
+    }
+    
+    static public class QuitButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent ev) {
+            System.exit(0);
         }
     }
     

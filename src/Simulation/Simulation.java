@@ -98,6 +98,7 @@ public class Simulation {
         map.update(unit);
         score[turn]=getTotalPop();
         if (score[turn]>maxScore) maxScore=score[turn];
+        
     }
     
     public int getTotalPop() {

@@ -28,7 +28,7 @@ public class LudumDare32 {
         sim = new Simulation(80,50,10,seed);
         player = new Player(sim);
         display = new DisplayFrame(sim,player, this);
-        
+        IntroFrame intro = new IntroFrame(sim.name);
         player.linkObject(display);
     }
     
@@ -55,7 +55,7 @@ public class LudumDare32 {
         
         timer = new Timer();
         updater =new UpdateTask();
-        timer.schedule(updater, 0, 10);
+        timer.schedule(updater, 0, 100);
     }
     
     public void update() {

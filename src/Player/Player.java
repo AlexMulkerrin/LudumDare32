@@ -36,6 +36,8 @@ public class Player extends MouseAdapter {
             areaEffect();
         } else if (brushType==4) { // select
             changeSelected();
+        } else if (brushType==5) { // select
+            giveGoto();
         }
         targetDisplay.repaint();
     }
@@ -100,6 +102,16 @@ public class Player extends MouseAdapter {
                 targetSim.mana--;
             }
         }
+    }
+    
+    public void giveGoto() {
+        if (targetSim.mana>0 && selectedAgent!=null) {
+            selectedAgent.targx=mouseX;
+            selectedAgent.targy=mouseY;
+            selectedAgent.isGoing=true;
+            targetSim.mana--;
+        }
+        brushType=4;
     }
     
     public void changeSelected() {
